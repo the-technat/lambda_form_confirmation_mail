@@ -23,17 +23,27 @@ The following JSON is at least required to send a correct mail, all other fields
 }
 ```
 
-## Configuration
-
-The following environment variables are needed for the function to know which SES to use:
-
-```bash
-
-```
-
 ## Deploy
 
-There would be a container image, but since it must be in ECR the rest of the deployment is currently manually done. This means:
+1. Create lambda named `blabla` using the following settings:
+
+- Runtime: `go1.x`
+- Handler: `main`
+- Function URL: yes, using Auth Type `NONE`
+- Env:
+  - SECRET=mySecret
+
+2. Create a secrets in aws secretsmanager with the name of the `SECRET` env of the function. Add the following self-explaining keys:
+
+- `MAIL_FROM`
+- `MAIL_USER`
+- `MAIL_PASSWORD`
+- `MAIL_HOST`
+
+3. Attach the `SecretsManagerReadWrite` to the execution role of your function
+Note: this grants your function access to all secrets which is not what you want in production!
+
+Finally upload the code using:
 
 ```bash
 FUNCTION=blabla make deploy
