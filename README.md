@@ -33,4 +33,13 @@ The following environment variables are needed for the function to know which SE
 
 ## Deploy
 
-Built as container image and deployed using [Terraform](https://github.com/alleaffengaffen/aws_baseline/blob/main/lambda.tf)
+There would be a container image, but since it must be in ECR the rest of the deployment is currently manually done. This means:
+
+```bash
+FUNCTION=blabla make deploy
+```
+
+Assuming that:
+
+- you got a local go env
+- you have the aws-cli installed and configured
