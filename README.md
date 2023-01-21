@@ -1,20 +1,12 @@
 # lambda_form_confirmation_mail
 
-Simple lambda written in Go that sends a confirmation mail using AWS SES to a given mail with the content of the form that was submitted as json in an HTTP POST request.
+![release workflow](https://github.com/the-technat/lambda_form_confirmation_mail/actions/workflows/release.yml/badge.svg)
 
-## Docs
+Simple lambda written in Go that sends a confirmation mail using SMTP to a given mail with the content of the form that was submitted.
 
-- <https://docs.aws.amazon.com/lambda/latest/dg/urls-invocation.html>
+## Usage
 
-## Test
-
-```bash
-curl -X POST -H "content-type: application/json"  -d '{"Submission Date":"02.06.2016 10:23:54","Form Title":"Contact","Name":"Tim Schmitt","E-Mail":"test@beispiel.de","Phone":"0123/456789","Message":"Webhook-Formular-Submission!"}' https://f4sqdd35mf57m4msx3z3nr4c36priot.lambda-url.sa-east-1.on.aws
-```
-
-## Input Model
-
-The following JSON is at least required to send a correct mail, all other fields are parsed as HTML table into the mail.
+Function expects a simple REST API call using POST and a JSON that contains at least the following fields:
 
 ```json
 {
@@ -23,33 +15,67 @@ The following JSON is at least required to send a correct mail, all other fields
 }
 ```
 
-## Deploy
+For example you could use the following curl command:
 
-1. Create lambda named `blabla` using the following settings:
+```bash
+curl -X POST -H "content-type: application/json"  -d '{"Submission Date":"02.06.2016 10:23:54","Form Title":"Contact","Name":"Tim Schmitt","E-Mail":"test@example.com","Phone":"0123/456789","Message":"Webhook-Formular-Submission!"}' https://f4sqdd35mf57m4msx3z3nr4c36priot.lambda-url.sa-east-1.on.aws
+```
 
-- Runtime: `go1.x`
-- Handler: `main`
-- Function URL: yes, using Auth Type `NONE`
-- Env:
-  - SECRET=mySecret
+## Configuration
 
-2. Create a secrets in aws secretsmanager with the name of the `SECRET` env of the function. Add the following self-explaining keys:
+The lambda reads all his configuration from a secret in AWS SecretsManager that has the same name as the lamda function. The secret itself should have the following keys:
 
 - `MAIL_FROM`
 - `MAIL_USER`
 - `MAIL_PASSWORD`
 - `MAIL_HOST`
 
-3. Attach the `SecretsManagerReadWrite` to the execution role of your function
-Note: this grants your function access to all secrets which is not what you want in production!
+### Runtime settings
 
-Finally upload the code using:
+- Runtime: `go1.x`
+- Handler: `main`
+- Architecture: `x86_64`
 
-```bash
-FUNCTION=blabla make deploy
+### Permissions
+
+The lambda needs the following policy in it's execution role:
+
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "logs:CreateLogGroup",
+            "Resource": "arn:aws:logs:sa-east-1:298300902191:*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
+            ],
+            "Resource": [
+                "arn:aws:logs:sa-east-1:298410952490:log-group:/aws/lambda/form_confirmation_mail:*"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Actions": [
+                "secretsmanager:GetSecretValue"
+            ],
+            "Resource": [
+                "arn:aws:secretsmanager:sa-east-1:298410952490:id_of_secret"
+            ]
+        }
+    ]
+}
 ```
 
-Assuming that:
+## Deploy
 
-- you got a local go env
-- you have the aws-cli installed and configured
+For every tag that is manually pushed to the repo, a GH action packages the code as zip file. See the latest release for the zip archive you can upload to your function.
+
+There is also a [container image](https://github.com/the-technat/lambda_form_confirmation_mail/pkgs/container/lambda_form_confirmation_mail) available to download for each release if you want to go that way, you just have to push it an ECR somewhere...
+
+Furthermore checkout this Terraform file to deploy the function and secret: <https://github.com/alleaffengaffen/aws_baseline/blob/main/lambda_form_confirmation_mail.tf>
