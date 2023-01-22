@@ -24,9 +24,9 @@ jobs:
           go-version: 1.19
           cache: true
       - name: Compile lambda
-        run: go build -o lambda_form_confirmation_mail main.go
+        run: go build -o main main.go
       - name: Package binary
-        run: zip lambda_form_confirmation_mail.zip lambda_form_confirmation_mail
+        run: zip main.zip main
       - name: Log in to the Container registry
         uses: docker/login-action@v2
         with:
