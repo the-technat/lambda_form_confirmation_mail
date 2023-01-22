@@ -18,23 +18,24 @@ Function expects a simple REST API call using POST and a JSON that contains at l
 For example you could use the following curl command:
 
 ```bash
-curl -X POST -H "content-type: application/json"  -d '{"Submission Date":"02.06.2016 10:23:54","Form Title":"Contact","Name":"Tim Schmitt","E-Mail":"test@example.com","Phone":"0123/456789","Message":"Webhook-Formular-Submission!"}' https://f4sqdd35mf57m4msx3z3nr4c36priot.lambda-url.sa-east-1.on.aws
+curl -X POST -H "content-type: application/json"  -d '{"Submission Date":"02.06.2016 10:23:54","Form Title":"Contact","Name":"Tim Schmitt","E-Mail":"technat@technat.ch","Phone":"0123/456789","Message":"Webhook-Formular-Submission!"}' https://f4sqdd35mf57m4msx3z3nr4c36priot.lambda-url.sa-east-1.on.aws
 ```
 
 ## Configuration
 
-The lambda reads all his configuration from a secret in AWS SecretsManager that has the same name as the lamda function. The secret itself should have the following keys:
+The lambda reads all his configuration from a secret in AWS SecretsManager. The name of the secret is lookup from env var `SECRET`. The secret itself should have the following keys:
 
 - `MAIL_FROM`
 - `MAIL_USER`
 - `MAIL_PASSWORD`
 - `MAIL_HOST`
 
-### Runtime settings
+### Function settings
 
 - Runtime: `go1.x`
 - Handler: `main`
 - Architecture: `x86_64`
+- Environment: `SECRET=nameOfYourSecret`
 
 ### Permissions
 
