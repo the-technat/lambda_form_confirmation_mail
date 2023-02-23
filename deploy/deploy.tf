@@ -6,6 +6,9 @@ variable "fcm_lambda_archive_version" {
   type    = string
   default = "v0.0.2"
 }
+variable "region" {
+  type = string
+}
 variable "resource_prefix" {
   type = string
 }
@@ -67,6 +70,11 @@ locals {
 }
 
 ##############
+# Data
+##############
+data "aws_caller_identity" "current" {}
+
+##############
 # Outputs
 # can be used
 ##############
@@ -109,7 +117,7 @@ resource "aws_iam_policy" "fcm_execution_policy" {
           "logs:PutLogEvents",
         ],
         Effect   = "Allow"
-        Resource = "arn:aws:logs:${local.region}:${data.aws_caller_identity.current.account_id}:*"
+        Resource = "arn:aws:logs:${var.region}:${data.aws_caller_identity.current.account_id}:*"
       },
       {
         Action = [
