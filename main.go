@@ -24,7 +24,8 @@ type Config struct {
 	MailFrom string `json:"MAIL_FROM"`
 	MailUser string `json:"MAIL_USER"`
 	MailPW   string `json:"MAIL_PW"`
-  MailPort int `json:"MAIL_PORT"`
+	MailPort int    `json:"MAIL_PORT"`
+	MailMsg  string `json:"MAIL_MSG"`
 }
 
 func main() {
@@ -51,7 +52,7 @@ func HandleLambdaEvent(req events.APIGatewayProxyRequest) (*events.APIGatewayPro
 		}, nil
 
 	}
-  log.Printf("Using user %s on %s:%d", config.MailUser, config.MailHost, config.MailPort)
+	log.Printf("Using user %s on %s:%d", config.MailUser, config.MailHost, config.MailPort)
 
 	// then take a look at the posted data
 	data := FormData{}
@@ -64,18 +65,18 @@ func HandleLambdaEvent(req events.APIGatewayProxyRequest) (*events.APIGatewayPro
 	}
 
 	// and send a mail with this data
-  m := mail.NewMessage()
-  m.SetHeader("From", config.MailFrom)
-  log.Printf("New form submitted %s for %s",data["Form Title"].(string), data["E-Mail"].(string))
+	m := mail.NewMessage()
+	m.SetHeader("From", config.MailFrom)
+	log.Printf("New form submitted %s for %s", data["Form Title"].(string), data["E-Mail"].(string))
 	m.SetHeader("To", data["E-Mail"].(string), config.MailFrom) // always send a copy to the sender
 	m.SetHeader("Subject", data["Form Title"].(string))
-	m.SetBody("text/html", fmt.Sprintf("Hello <b>%s</b></br>Your form was successfully submited.</br>%s", data["Name"].(string), req.Body))
+	m.SetBody("text/html", fmt.Sprintf("Hello <b>%s</b></br>%s</br>%s", data["Name"].(string), config.MailMsg, req.Body))
 	d := mail.NewDialer(config.MailHost, config.MailPort, config.MailUser, config.MailPW)
-  if err := d.DialAndSend(m); err != nil {
-    return &events.APIGatewayProxyResponse{
-      StatusCode: http.StatusInternalServerError,
-      Body:       fmt.Sprintf("couldn't send mail: %v", err),
-    }, nil
+	if err := d.DialAndSend(m); err != nil {
+		return &events.APIGatewayProxyResponse{
+			StatusCode: http.StatusInternalServerError,
+			Body:       fmt.Sprintf("couldn't send mail: %v", err),
+		}, nil
 	}
 
 	log.Println("email sent successfully")

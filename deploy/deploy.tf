@@ -1,7 +1,61 @@
+##############
+# Variables
+# Passed using TFC, CI/CD or CLI
+##############
+variable "fcm_lambda_archive_version" {
+  type    = string
+  default = "v0.0.2"
+}
+variable "resource_prefix" {
+  type = string
+}
+variable "mail_host" {
+  type = string
+}
+variable "mail_from" {
+  type = string
+}
+variable "mail_user" {
+  type = string
+}
+variable "mail_pw" {
+  type      = string
+  sensitive = true
+}
+variable "mail_port" {
+  type = number
+}
+variable "mail_msg" {
+  type = string
+}
+
+##############
+# Terraform Config
+##############
+terraform {
+  required_providers {
+    random = {
+      source = "hashicorp/random"
+    }
+    null = {
+      source = "hashicorp/null"
+    }
+    aws = {
+      source = "hashicorp/aws"
+    }
+  }
+}
+
+##############
+# Locals
+# Internally used
+##############
 locals {
-  resource_prefix            = "js_weekend"
-  fcm_lambda_archive_version = "v0.0.2"
-  fcm_resource_name          = format("%s%s", local.resource_prefix, "form_confirmation_mail")
+  fcm_resource_name = format("%s%s", var.resource_prefix, "form_confirmation_mail")
+  common_tags = {
+    "name"    = local.fcm_resource_name
+    "project" = "https://github.com/the-technat/lambda_form_confirmation_mail"
+  }
   fcm_secret_data = {
     "MAIL_HOST" = var.mail_host
     "MAIL_FROM" = var.mail_from
@@ -12,13 +66,20 @@ locals {
   }
 }
 
+##############
+# Outputs
+# can be used
+##############
+output "fcm_webhook" {
+  value = aws_lambda_function_url.fcm_webhook.function_url
+}
+
+##############
+# Resources
+##############
 resource "random_string" "random" {
   length  = 8
   special = false
-}
-
-output "fcm_webhook" {
-  value = aws_lambda_function_url.fcm_webhook.function_url
 }
 
 resource "aws_secretsmanager_secret" "fcm_secret" {
@@ -62,7 +123,6 @@ resource "aws_iam_policy" "fcm_execution_policy" {
     ]
   })
 
-
   tags = local.common_tags
 }
 
@@ -95,7 +155,7 @@ resource "null_resource" "fcm_lambda_code" {
   }
 
   provisioner "local-exec" {
-    command = "wget https://github.com/the-technat/lambda_form_confirmation_mail/releases/download/${local.fcm_lambda_archive_version}/main.zip"
+    command = "wget https://github.com/the-technat/lambda_form_confirmation_mail/releases/download/${var.fcm_lambda_archive_version}/main.zip"
   }
 }
 
