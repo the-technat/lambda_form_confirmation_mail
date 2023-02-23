@@ -10,8 +10,9 @@ Function expects a simple REST API call using POST and a JSON that contains at l
 
 ```json
 {
-  "Form Title": "Registration for Event XYZ", -> Mail subject line
-  "E-Mail": "technat@technat.ch", -> Receiver of the mail
+  "Form Title": "Registration for Event XYZ", // Mail subject line
+  "E-Mail": "technat@technat.ch", // Receiver of the mail
+  "Name": "Nathanael Liechti", // Greeted in mail
 }
 ```
 
@@ -29,6 +30,8 @@ The lambda reads all his configuration from a secret in AWS SecretsManager. The 
 - `MAIL_USER`
 - `MAIL_PASSWORD`
 - `MAIL_HOST`
+- `MAIL_PORT`
+- `MAIL_MSG` -> apart from a greeting and the submitted data, this is the text that can be added to the MSG
 
 ### Function settings
 

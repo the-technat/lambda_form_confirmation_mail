@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/smtp"
 	"os"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -13,26 +12,19 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/secretsmanager"
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/go-mail/mail"
 
 	log "github.com/sirupsen/logrus"
 )
 
 type FormData map[string]interface{}
 
-type Secret struct {
+type Config struct {
 	MailHost string `json:"MAIL_HOST"`
 	MailFrom string `json:"MAIL_FROM"`
 	MailUser string `json:"MAIL_USER"`
 	MailPW   string `json:"MAIL_PW"`
-}
-
-type Mail struct {
-	Sender  string
-	To      []string
-	Cc      []string
-	Bcc     []string
-	Subject string
-	Body    string
+  MailPort int `json:"MAIL_PORT"`
 }
 
 func main() {
@@ -42,23 +34,24 @@ func main() {
 func HandleLambdaEvent(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
 	log.Debugf("event: %+v", req)
 
-	// first get the secrets
-	secret, err := readSecret(os.Getenv("SECRET"))
+	// first get the config
+	awsSecret, err := readSecret(os.Getenv("SECRET"))
 	if err != nil {
 		return &events.APIGatewayProxyResponse{
 			StatusCode: http.StatusInternalServerError,
 			Body:       fmt.Sprintf("could not retrive secret %s: %v", os.Getenv("SECRET"), err),
 		}, nil
 	}
-	secretData := Secret{}
-	err = json.Unmarshal([]byte(secret), &secretData)
+	config := Config{}
+	err = json.Unmarshal([]byte(awsSecret), &config)
 	if err != nil {
 		return &events.APIGatewayProxyResponse{
 			StatusCode: http.StatusInternalServerError,
-			Body:       fmt.Sprintf("secret has unknown structure: %v", err),
+			Body:       fmt.Sprintf("config secret has unknown structure: %v", err),
 		}, nil
 
 	}
+  log.Printf("Using user %s on %s:%d", config.MailUser, config.MailHost, config.MailPort)
 
 	// then take a look at the posted data
 	data := FormData{}
@@ -71,21 +64,21 @@ func HandleLambdaEvent(req events.APIGatewayProxyRequest) (*events.APIGatewayPro
 	}
 
 	// and send a mail with this data
-	to := []string{data["E-Mail"].(string)}
-	log.Printf("New mail for %s", to[0])
-
-	msg := "Hello geeks!!!"
-	log.Printf("Using user %s on %s", secretData.MailUser, secretData.MailHost)
-	auth := smtp.PlainAuth("", secretData.MailUser, secretData.MailPW, secretData.MailHost)
-	err = smtp.SendMail(secretData.MailHost, auth, secretData.MailFrom, to, []byte(msg))
-	if err != nil {
-		return &events.APIGatewayProxyResponse{
-			StatusCode: http.StatusInternalServerError,
-			Body:       fmt.Sprintf("couldn't send mail: %v", err),
-		}, nil
+  m := mail.NewMessage()
+  m.SetHeader("From", config.MailFrom)
+  log.Printf("New form submitted %s for %s",data["Form Title"].(string), data["E-Mail"].(string))
+	m.SetHeader("To", data["E-Mail"].(string), config.MailFrom) // always send a copy to the sender
+	m.SetHeader("Subject", data["Form Title"].(string))
+	m.SetBody("text/html", fmt.Sprintf("Hello <b>%s</b></br>Your form was successfully submited.</br>%s", data["Name"].(string), req.Body))
+	d := mail.NewDialer(config.MailHost, config.MailPort, config.MailUser, config.MailPW)
+  if err := d.DialAndSend(m); err != nil {
+    return &events.APIGatewayProxyResponse{
+      StatusCode: http.StatusInternalServerError,
+      Body:       fmt.Sprintf("couldn't send mail: %v", err),
+    }, nil
 	}
 
-	fmt.Println("Email sent successfully")
+	log.Println("email sent successfully")
 	return &events.APIGatewayProxyResponse{
 		StatusCode: http.StatusOK,
 		Body:       "sent mail",

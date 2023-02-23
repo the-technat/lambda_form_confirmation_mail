@@ -7,6 +7,7 @@ require (
 	github.com/aws/aws-sdk-go v1.44.184
 	github.com/aws/aws-sdk-go-v2/config v1.18.8
 	github.com/aws/aws-sdk-go-v2/service/secretsmanager v1.18.1
+	github.com/go-mail/mail v2.3.1+incompatible
 	github.com/sirupsen/logrus v1.9.0
 )
 
@@ -23,4 +24,6 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sts v1.18.0 // indirect
 	github.com/aws/smithy-go v1.13.5 // indirect
 	golang.org/x/sys v0.1.0 // indirect
+	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
+	gopkg.in/mail.v2 v2.3.1 // indirect
 )
