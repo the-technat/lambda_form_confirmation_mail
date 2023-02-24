@@ -1,8 +1,3 @@
-variable "lambda_archive_version" {
-  type        = string
-  default     = "v0.0.3"
-  description = "Version of the function to deploy"
-}
 variable "region" {
   type        = string
   description = "AWS region you want to deploy the function in"

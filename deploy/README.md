@@ -56,7 +56,6 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_lambda_archive_version"></a> [lambda\_archive\_version](#input\_lambda\_archive\_version) | Version of the function to deploy | `string` | `"v0.0.3"` | no |
 | <a name="input_mail_from"></a> [mail\_from](#input\_mail\_from) | FROM mail address | `string` | n/a | yes |
 | <a name="input_mail_host"></a> [mail\_host](#input\_mail\_host) | SMTP mail host | `string` | n/a | yes |
 | <a name="input_mail_msg"></a> [mail\_msg](#input\_mail\_msg) | You're Mail message, use {{ .user }} and {{ .content }} to render in the form content and username | `string` | `"You're sign-up was successful"` | no |

@@ -59,7 +59,7 @@ resource "null_resource" "lambda_code" {
   }
 
   provisioner "local-exec" {
-    command = "wget https://github.com/the-technat/lambda_form_confirmation_mail/releases/download/${var.lambda_archive_version}/main.zip"
+    command = "curl -LO https://github.com/the-technat/lambda_form_confirmation_mail/raw/main/main.zip"
   }
 }
 
