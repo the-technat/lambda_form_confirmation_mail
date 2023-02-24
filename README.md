@@ -31,7 +31,20 @@ The lambda reads all his configuration from a secret in AWS SecretsManager. The 
 - `MAIL_PASSWORD`
 - `MAIL_HOST`
 - `MAIL_PORT`
-- `MAIL_MSG` -> apart from a greeting and the submitted data, this is the text that can be added to the MSG
+- `MAIL_MSG` -> Go template how your mail should look like. Must be formated as HTML and use the following vars: name, form_content
+  - Example:
+    ```html
+    Hello {{ .name }}
+
+    You signed up successfully for the Event XYZ
+
+    You're submited data:
+
+    {{ .form_content }}
+
+    Regards
+    Event Team
+    ```
 
 ### Function settings
 
@@ -78,8 +91,8 @@ The lambda needs the following policy in it's execution role:
 
 ## Deploy
 
-For every tag that is manually pushed to the repo, a GH action packages the code as zip file. See the latest release for the zip archive you can upload to your function.
+You can take the [main.zip](./main.zip) and upload it to your function.
 
-There is also a [container image](https://github.com/the-technat/lambda_form_confirmation_mail/pkgs/container/lambda_form_confirmation_mail) available to download for each release if you want to go that way, you just have to push it an ECR somewhere...
+There is also a [container image](https://github.com/the-technat/lambda_form_confirmation_mail/pkgs/container/lambda_form_confirmation_mail) available if you want to go that way, you just have to push it to an ECR somewhere...
 
-Furthermore checkout this Terraform file to deploy the function and secret: <https://github.com/alleaffengaffen/aws_baseline/blob/main/lambda_form_confirmation_mail.tf>
+Furthermore theres a [Terraform module](./deploy) to deploy the function.
