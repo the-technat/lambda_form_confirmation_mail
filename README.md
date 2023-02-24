@@ -1,8 +1,8 @@
 # lambda_form_confirmation_mail
 
-![release workflow](https://github.com/the-technat/lambda_form_confirmation_mail/actions/workflows/release.yml/badge.svg)
+![artifacts workflow](https://github.com/the-technat/lambda_form_confirmation_mail/actions/workflows/artifacts.yml/badge.svg)
 
-Simple lambda written in Go that sends a confirmation mail using SMTP to a given mail with the content of the form that was submitted.
+Simple lambda written in Go that sends a mail using SMTP to a given mail with the content of the JSON that was submitted. Used to send confirmation mails for web forms that can do webhooks but don't implement confirmations mails on their own.
 
 ## Usage
 
@@ -16,7 +16,7 @@ Function expects a simple REST API call using POST and a JSON that contains at l
 }
 ```
 
-For example you could use the following curl command:
+For example you could use the following curl command to trigger a new mail:
 
 ```bash
 curl -X POST -H "content-type: application/json"  -d '{"Submission Date":"02.06.2016 10:23:54","Form Title":"Contact","Name":"Tim Schmitt","E-Mail":"technat@technat.ch","Phone":"0123/456789","Message":"Webhook-Formular-Submission!"}' https://f4sqdd35mf57m4msx3z3nr4c36priot.lambda-url.sa-east-1.on.aws
@@ -24,13 +24,13 @@ curl -X POST -H "content-type: application/json"  -d '{"Submission Date":"02.06.
 
 ## Configuration
 
-The lambda reads all his configuration from a secret in AWS SecretsManager. The name of the secret is lookup from env var `SECRET`. The secret itself should have the following keys:
+The lambda reads all configuration from a secret in AWS SecretsManager. The name of the secret is looked up from env var `SECRET`. The secret itself should have the following keys:
 
-- `MAIL_FROM`
-- `MAIL_USER`
-- `MAIL_PASSWORD`
-- `MAIL_HOST`
-- `MAIL_PORT`
+- `MAIL_FROM` -> From mail address
+- `MAIL_USER` -> User for the mail account
+- `MAIL_PASSWORD` -> Password for the mail account
+- `MAIL_HOST` -> SMTP host
+- `MAIL_PORT` -> Port of your SMTP host
 - `MAIL_MSG` -> Go template how your mail should look like. Must be formated as HTML and use the following vars: name, form_content
   - Example:
     ```html
@@ -48,46 +48,44 @@ The lambda reads all his configuration from a secret in AWS SecretsManager. The 
 
 ### Function settings
 
+Use the following settings when configuring a function:
+
 - Runtime: `go1.x`
 - Handler: `main`
 - Architecture: `x86_64`
 - Environment: `SECRET=nameOfYourSecret`
-
-### Permissions
-
-The lambda needs the following policy in it's execution role:
-
-```json
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": "logs:CreateLogGroup",
-            "Resource": "arn:aws:logs:sa-east-1:298300902191:*"
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
-                "logs:CreateLogStream",
-                "logs:PutLogEvents"
-            ],
-            "Resource": [
-                "arn:aws:logs:sa-east-1:298410952490:log-group:/aws/lambda/form_confirmation_mail:*"
-            ]
-        },
-        {
-            "Effect": "Allow",
-            "Actions": [
-                "secretsmanager:GetSecretValue"
-            ],
-            "Resource": [
-                "arn:aws:secretsmanager:sa-east-1:298410952490:id_of_secret"
-            ]
-        }
-    ]
-}
-```
+- Execution Policy: create new one using:
+  ```json
+  {
+      "Version": "2012-10-17",
+      "Statement": [
+          {
+              "Effect": "Allow",
+              "Action": "logs:CreateLogGroup",
+              "Resource": "arn:aws:logs:sa-east-1:298300902191:*"
+          },
+          {
+              "Effect": "Allow",
+              "Action": [
+                  "logs:CreateLogStream",
+                  "logs:PutLogEvents"
+              ],
+              "Resource": [
+                  "arn:aws:logs:sa-east-1:298410952490:log-group:/aws/lambda/form_confirmation_mail:*"
+              ]
+          },
+          {
+              "Effect": "Allow",
+              "Actions": [
+                  "secretsmanager:GetSecretValue"
+              ],
+              "Resource": [
+                  "arn:aws:secretsmanager:sa-east-1:298410952490:id_of_secret"
+              ]
+          }
+      ]
+  }
+  ```
 
 ## Deploy
 
