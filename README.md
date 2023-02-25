@@ -33,16 +33,16 @@ The lambda reads all configuration from a secret in AWS SecretsManager. The name
 - `MAIL_HOST` -> SMTP host
 - `MAIL_PORT` -> Port of your SMTP host
 - `MAIL_COPY` -> Whether you shall receive a copy of the mail
-- `MAIL_MSG` -> Go template how your mail should look like. Must be formated as HTML and use the following vars: name, form_content
+- `MAIL_MSG` -> Go template how your mail should look like. Must be formatted as HTML and can contain any number of keys from the JSON above
   - Example:
     ```html
-    Hello {{ .name }}
+    Hello {{ .Name }}
 
     You signed up successfully for the Event XYZ
 
     You're submited data:
 
-    {{ .form_content }}
+    {{ .items }}
 
     Regards
     Event Team
