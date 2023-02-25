@@ -5,11 +5,11 @@ locals {
     "project" = "https://github.com/the-technat/lambda_form_confirmation_mail"
   }
   secret_data = {
-    "MAIL_HOST" = var.mail_host
-    "MAIL_FROM" = var.mail_from
-    "MAIL_USER" = var.mail_user
-    "MAIL_PW"   = var.mail_pw
-    "MAIL_PORT" = var.mail_port
-    "MAIL_MSG"  = var.mail_msg
+    "MAIL_HOST"     = var.mail_host
+    "MAIL_FROM"     = var.mail_from
+    "MAIL_USER"     = var.mail_user
+    "MAIL_PASSWORD" = var.mail_pw
+    "MAIL_PORT"     = var.mail_port
+    "MAIL_MSG"      = var.mail_msg
   }
 }

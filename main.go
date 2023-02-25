@@ -29,7 +29,7 @@ type Config struct {
 	MailPort string `json:"MAIL_PORT"`
 	MailFrom string `json:"MAIL_FROM"`
 	MailUser string `json:"MAIL_USER"`
-	MailPW   string `json:"MAIL_PW"`
+	MailPW   string `json:"MAIL_PASSWORD"`
 	MailMsg  string `json:"MAIL_MSG"`
   MailCopy bool   `json:"MAIL_COPY"`
 }
@@ -52,7 +52,7 @@ func HandleLambdaEvent(req events.APIGatewayProxyRequest) (*events.APIGatewayPro
 	if err != nil {
     return nil, fmt.Errorf("couldn't unmarshal secret into known structure: %v", err)
 	}
-  log.Info("successfully read config from secret, user: %s, host: %s:%s", config.MailUser, config.MailHost, config.MailPort)
+  log.Infof("successfully read config from secret, user: %s, host: %s:%s", config.MailUser, config.MailHost, config.MailPort)
 
   // parse incoming json data
 	data := FormData{}
