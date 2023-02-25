@@ -78,11 +78,11 @@ Use the following settings when configuring a function:
           },
           {
               "Effect": "Allow",
-              "Actions": [
+              "Action": [
                   "secretsmanager:GetSecretValue"
               ],
               "Resource": [
-                  "arn:aws:secretsmanager:sa-east-1:298410952490:id_of_secret"
+                  "arn:aws:secretsmanager:sa-east-1:298410952490:secret:id_of_secret"
               ]
           }
       ]
