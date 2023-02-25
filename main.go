@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strconv"
 	"text/template"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -25,7 +26,7 @@ type FormData map[string]interface{}
 // Config represent the keys that should be present in the AWS SecretsManager secret
 type Config struct {
 	MailHost string `json:"MAIL_HOST"`
-	MailPort int    `json:"MAIL_PORT"`
+	MailPort string `json:"MAIL_PORT"`
 	MailFrom string `json:"MAIL_FROM"`
 	MailUser string `json:"MAIL_USER"`
 	MailPW   string `json:"MAIL_PW"`
@@ -88,7 +89,11 @@ func HandleLambdaEvent(req events.APIGatewayProxyRequest) (*events.APIGatewayPro
 	m.SetHeader("Subject", data["Form Title"].(string))
 	m.SetBody("text/html", msg.String())
 
-	d := mail.NewDialer(config.MailHost, config.MailPort, config.MailUser, config.MailPW)
+  port, err := strconv.Atoi(config.MailPort)
+  if err != nil {
+    return nil, fmt.Errorf("cannot convert MAIL_PORT to int: %v", err)
+  }
+	d := mail.NewDialer(config.MailHost, port, config.MailUser, config.MailPW)
 	if err := d.DialAndSend(m); err != nil {
     return nil, fmt.Errorf("coulnd't send mail: %v", err)
   }
