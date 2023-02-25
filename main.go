@@ -52,7 +52,7 @@ func HandleLambdaEvent(req events.APIGatewayProxyRequest) (*events.APIGatewayPro
 	if err != nil {
     return nil, fmt.Errorf("couldn't unmarshal secret into known structure: %v", err)
 	}
-  log.Info("successfully read config from secret")
+  log.Info("successfully read config from secret, user: %s, host: %s:%s", config.MailUser, config.MailHost, config.MailPort)
 
   // parse incoming json data
 	data := FormData{}
