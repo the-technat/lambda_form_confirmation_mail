@@ -1,7 +1,7 @@
 FROM public.ecr.aws/lambda/provided:al2 as build
 
 # install go
-RUN yum install -y golang-1.19 && yum clean all
+RUN yum install -y golang && yum clean all
 
 # build
 WORKDIR /src
