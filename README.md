@@ -3,7 +3,7 @@
 ![artifacts workflow](https://github.com/the-technat/lambda_form_confirmation_mail/actions/workflows/artifacts.yml/badge.svg)
 ![go version](https://img.shields.io/github/go-mod/go-version/the-technat/lambda_form_confirmation_mail)
 
-Simple lambda written in Go that sends a mail using SMTP to a given mail with the content of the JSON that was submitted. Used to send confirmation mails for web forms that can do webhooks but don't implement confirmations mails on their own.
+Simple lambda written in Go that sends a mail using SMTP to a given address with the content of the JSON that was submitted. Used to send confirmation mails for web forms that can do webhooks but don't implement confirmations mails on their own.
 
 ## Usage
 
