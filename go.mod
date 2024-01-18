@@ -3,7 +3,7 @@ module github.com/the-technat/lambda_form_confirmation_mail
 go 1.19
 
 require (
-	github.com/aws/aws-lambda-go v1.44.0
+	github.com/aws/aws-lambda-go v1.45.0
 	github.com/aws/aws-sdk-go v1.49.23
 	github.com/aws/aws-sdk-go-v2/config v1.26.4
 	github.com/aws/aws-sdk-go-v2/service/secretsmanager v1.26.2
